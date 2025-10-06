@@ -21,9 +21,7 @@ model Nutricionista {
   senha        String
   criadoEm     DateTime @default(now())
   desativadoEm DateTime?
-  cd_setor     Int
-  
-  setor        Setor    @relation(fields: [cd_setor], references: [cd_setor])
+
   consultas    Consulta[]
 }
 
@@ -87,7 +85,9 @@ model Paciente {
   telefone         String?  @db.VarChar(11)
   sexo             String?  @db.Char(1)
   naturalidade     String?  @db.VarChar(60)
-
+  cd_setor     Int
+  
+  setor        Setor    @relation(fields: [cd_setor], references: [cd_setor])
   consultas          Consulta[]
   dadosDieteticos    DadosDieteticos?
   estilosVida        EstilosVida?
