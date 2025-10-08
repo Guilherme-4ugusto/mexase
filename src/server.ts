@@ -3,6 +3,7 @@ import express, { Request, Response } from "express";
 import cors from 'cors';
 import nutricionistaRoutes from './routes/nutricionista.routes';
 import loginRoutes from './routes/login.routes';
+import pacienteRoutes from './routes/paciente.routes';
 
 
 dotenv.config();
@@ -14,6 +15,7 @@ const PORT = process.env.PORT;
 
 app.use('/api', nutricionistaRoutes);
 app.use('/api', loginRoutes);
+app.use('/api', pacienteRoutes)
 
 
 app.listen(PORT, () => { 

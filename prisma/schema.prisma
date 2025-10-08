@@ -10,6 +10,7 @@ datasource db {
 model Setor {
   cd_setor Int    @id @default(autoincrement())
   nome     String @db.VarChar(60)
+  pacientes       Paciente[]
   nutricionistas Nutricionista[]
 }
 
@@ -81,6 +82,7 @@ model Paciente {
   id               Int      @id @default(autoincrement())
   nome             String   @db.VarChar(150)
   email            String?  @db.VarChar(254)
+  cpf              String   @db.VarChar(11)
   data_nascimento  DateTime
   telefone         String?  @db.VarChar(11)
   sexo             String?  @db.Char(1)
