@@ -11,6 +11,7 @@ model Setor {
   cd_setor Int    @id @default(autoincrement())
   nome     String @db.VarChar(60)
   pacientes       Paciente[]
+  nutricionistas Nutricionista[]
 }
 
 model Nutricionista {
