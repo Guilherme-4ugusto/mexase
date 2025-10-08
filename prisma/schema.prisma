@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  //output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -14,12 +7,164 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Setor {
+  cd_setor Int    @id @default(autoincrement())
+  nome     String @db.VarChar(60)
+  nutricionistas Nutricionista[]
+}
+
 model Nutricionista {
-  id        Int     @id @default(autoincrement())
-  matricula Int @unique
-  nome      String @db.VarChar(150)
-  email     String  @unique @db.VarChar(254)
-  senha     String
-  criadoEm  DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  matricula    Int      @unique
+  nome         String   @db.VarChar(150)
+  email        String   @unique @db.VarChar(254)
+  senha        String
+  criadoEm     DateTime @default(now())
   desativadoEm DateTime?
+
+  consultas    Consulta[]
+}
+
+model Consulta {
+  id                     Int      @id @default(autoincrement())
+  eliminacao_intestinal   String? @db.VarChar(60)
+  frequencia_evacuatoria  String? @db.VarChar(60)
+  peso_atual              Float?
+  peso_habitual           Float?
+  estatura                Float?
+  imc_atual               Float?
+  cb                      Float?
+  cc                      Float?
+  cq                      Float?
+  c_pescoco               Float?
+  dct                     Float?
+  dcb                     Float?
+  dcse                    Float?
+  dcsi                    Float?
+  dcx                     Float?
+  dca                     Float?
+  ambc                    Float?
+  cmb                     Float?
+  somatorio_dobras        Float?
+  id_diagnostico          Int
+  id_nutricionista        Int
+  id_paciente             Int
+  id_dados_bioquimicos    Int
+  id_recordatorio         Int
+
+  nutricionista  Nutricionista  @relation(fields: [id_nutricionista], references: [id])
+  paciente       Paciente       @relation(fields: [id_paciente], references: [id])
+  diagnostico    Diagnostico    @relation(fields: [id_diagnostico], references: [id])
+  dadosBioquimicos DadosBioquimicos @relation(fields: [id_dados_bioquimicos], references: [id])
+  recordatorio   Recordatorio   @relation(fields: [id_recordatorio], references: [id])
+  classificacoes Classificacao[]
+}
+
+model Classificacao {
+  id                  Int      @id @default(autoincrement())
+  consulta_id         Int
+  parametro           String   @db.VarChar(50)
+  valor_classificacao String   @db.VarChar(100)
+
+  consulta Consulta @relation(fields: [consulta_id], references: [id])
+}
+
+model Diagnostico {
+  id                        Int     @id @default(autoincrement())
+  diagnostico_nutricional   String? @db.VarChar(400)
+  diagnostico_dietoterapia  String? @db.VarChar(400)
+  conduta_nutricional       String? @db.VarChar(400)
+  consultas                 Consulta[]
+}
+
+model Paciente {
+  id               Int      @id @default(autoincrement())
+  nome             String   @db.VarChar(150)
+  email            String?  @db.VarChar(254)
+  data_nascimento  DateTime
+  telefone         String?  @db.VarChar(11)
+  sexo             String?  @db.Char(1)
+  naturalidade     String?  @db.VarChar(60)
+  cd_setor     Int
+  
+  setor        Setor    @relation(fields: [cd_setor], references: [cd_setor])
+  consultas          Consulta[]
+  dadosDieteticos    DadosDieteticos?
+  estilosVida        EstilosVida?
+  historicoFamiliar  HistoricoFamiliar?
+}
+
+model DadosBioquimicos {
+  id           Int    @id @default(autoincrement())
+  hemoglobina  Float?
+  hematocrito  Float?
+  consultas    Consulta[]
+}
+
+model Recordatorio {
+  id                Int     @id @default(autoincrement())
+  horario_refeicao  String  @db.Char(1)
+  frequencia        String  @db.Char(1)
+  observacao        String? @db.VarChar(250)
+  id_grupo_alimentar Int
+
+  grupoAlimentar GrupoAlimentar @relation(fields: [id_grupo_alimentar], references: [id])
+  consultas      Consulta[]
+}
+
+model GrupoAlimentar {
+  id              Int     @id @default(autoincrement())
+  nome            String  @db.VarChar(150)
+  recordatorios   Recordatorio[]
+}
+
+model DadosDieteticos {
+  id                    Int      @id @default(autoincrement())
+  paciente_id           Int      @unique
+  aversao_alimentos     String?  @db.VarChar(150)
+  preferencia_alimentos String?  @db.VarChar(150)
+  alergia_alimentos     String?  @db.VarChar(150)
+
+  paciente Paciente @relation(fields: [paciente_id], references: [id])
+}
+
+
+model EstilosVida {
+  id                         Int      @id @default(autoincrement())
+  paciente_id                Int      @unique
+  tipo_exercicio             String?  @db.VarChar(100)
+  frequencia_exercicio_semana Int?
+  duracao_exercicio_minutos  Int?
+  orientacao_dieta           String?  @db.VarChar(100)
+  tabagista_status           String?  @db.VarChar(20)
+  etilista                   Boolean
+  duracao_etilismo_anos      Int?
+  frequencia_etilismo        String?  @db.VarChar(50)
+  problema_denticao          Boolean  @default(false)
+  tempo_sono_horas           Decimal? @db.Decimal(3, 1)
+  medicamentos               String?  @db.VarChar(150)
+  suplementos                String?  @db.VarChar(150)
+  restricao_sal              Boolean  @default(false)
+  restricao_acucar           Boolean  @default(false)
+  outras_restricoes          String?  @db.VarChar(100)
+  local_refeicoes            String?  @db.VarChar(100)
+  quem_prepara_refeicoes     String?  @db.VarChar(100)
+
+  paciente Paciente @relation(fields: [paciente_id], references: [id])
+}
+
+model HistoricoFamiliar {
+  id                        Int      @id @default(autoincrement())
+  paciente_id               Int      @unique
+  historico_hipertensao     Boolean  @default(false)
+  historico_diabetes        Boolean  @default(false)
+  historico_dislipidemia    Boolean  @default(false)
+  historico_cancer          Boolean  @default(false)
+  historico_cardiacas       Boolean  @default(false)
+  historico_tireoide        Boolean  @default(false)
+  historico_excesso_peso    Boolean  @default(false)
+  historico_outras_condicoes String? @db.VarChar(250)
+  antecedentes_familiares   String?  @db.VarChar(250)
+
+  paciente Paciente @relation(fields: [paciente_id], references: [id])
 }
