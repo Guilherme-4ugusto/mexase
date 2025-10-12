@@ -87,6 +87,8 @@ model Paciente {
   sexo             String?  @db.Char(1)
   naturalidade     String?  @db.VarChar(60)
   cd_setor     Int
+  criadoEm     DateTime @default(now())
+  desativadoEm DateTime?
   
   setor        Setor    @relation(fields: [cd_setor], references: [cd_setor])
   consultas          Consulta[]
