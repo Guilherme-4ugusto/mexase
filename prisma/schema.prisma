@@ -11,7 +11,6 @@ model Setor {
   cd_setor Int    @id @default(autoincrement())
   nome     String @db.VarChar(60)
   pacientes       Paciente[]
-  nutricionistas Nutricionista[]
 }
 
 model Nutricionista {
@@ -88,6 +87,8 @@ model Paciente {
   sexo             String?  @db.Char(1)
   naturalidade     String?  @db.VarChar(60)
   cd_setor     Int
+  criadoEm     DateTime @default(now())
+  desativadoEm DateTime?
   
   setor        Setor    @relation(fields: [cd_setor], references: [cd_setor])
   consultas          Consulta[]
@@ -101,6 +102,7 @@ model DadosBioquimicos {
   hemoglobina  Float?
   hematocrito  Float?
   consultas    Consulta[]
+  @@map("dados_bioquimicos")
 }
 
 model Recordatorio {
@@ -118,6 +120,7 @@ model GrupoAlimentar {
   id              Int     @id @default(autoincrement())
   nome            String  @db.VarChar(150)
   recordatorios   Recordatorio[]
+  @@map("grupo_alimentar")
 }
 
 model DadosDieteticos {
@@ -128,6 +131,7 @@ model DadosDieteticos {
   alergia_alimentos     String?  @db.VarChar(150)
 
   paciente Paciente @relation(fields: [paciente_id], references: [id])
+  @@map("dados_dieteticos")
 }
 
 
@@ -153,6 +157,7 @@ model EstilosVida {
   quem_prepara_refeicoes     String?  @db.VarChar(100)
 
   paciente Paciente @relation(fields: [paciente_id], references: [id])
+  @@map("estilos_vida")
 }
 
 model HistoricoFamiliar {
@@ -169,4 +174,6 @@ model HistoricoFamiliar {
   antecedentes_familiares   String?  @db.VarChar(250)
 
   paciente Paciente @relation(fields: [paciente_id], references: [id])
+
+  @@map("historico_familiar")
 }
