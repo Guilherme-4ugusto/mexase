@@ -9,11 +9,7 @@ import { PacienteJaAtivadoException } from '../common/exceptions/paciente/pacien
 export class PacienteService {
   async criar({ nome, email, cpf, data_nascimento, naturalidade, sexo, telefone, cd_setor }: CriarPacienteDTO) {
     const existe = await prisma.paciente.findFirst({
-      where: {
-        OR: [
-          { cpf }
-        ]
-      },
+      where: { cpf },
     });
 
     if (existe) throw new PacienteJaCadastradoException();

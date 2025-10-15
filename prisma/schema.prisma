@@ -102,6 +102,7 @@ model DadosBioquimicos {
   hemoglobina  Float?
   hematocrito  Float?
   consultas    Consulta[]
+  @@map("dados_bioquimicos")
 }
 
 model Recordatorio {
@@ -119,6 +120,7 @@ model GrupoAlimentar {
   id              Int     @id @default(autoincrement())
   nome            String  @db.VarChar(150)
   recordatorios   Recordatorio[]
+  @@map("grupo_alimentar")
 }
 
 model DadosDieteticos {
@@ -129,6 +131,7 @@ model DadosDieteticos {
   alergia_alimentos     String?  @db.VarChar(150)
 
   paciente Paciente @relation(fields: [paciente_id], references: [id])
+  @@map("dados_dieteticos")
 }
 
 
@@ -154,6 +157,7 @@ model EstilosVida {
   quem_prepara_refeicoes     String?  @db.VarChar(100)
 
   paciente Paciente @relation(fields: [paciente_id], references: [id])
+  @@map("estilos_vida")
 }
 
 model HistoricoFamiliar {
@@ -170,4 +174,6 @@ model HistoricoFamiliar {
   antecedentes_familiares   String?  @db.VarChar(250)
 
   paciente Paciente @relation(fields: [paciente_id], references: [id])
+
+  @@map("historico_familiar")
 }
