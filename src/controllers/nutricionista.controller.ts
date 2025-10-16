@@ -3,6 +3,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { NutricionistaService } from '../services/nutricionista.service';
 import { CriarNutricionistaDTO } from '../dtos/nutricionista.dto';
+import { logger } from '../utils/logger';
 
 const service = new NutricionistaService();
 
@@ -21,6 +22,7 @@ export const criarNutricionista = async (req: Request, res: Response) => {
     const novoNutricionista = await service.criar(dto);
     return res.status(201).json(novoNutricionista);
   } catch (error: any) {
+    logger.error(error);
     if (error.message === 'Email ou matricula já cadastrado') {
       return res.status(409).json({ error: error.message });
     }
@@ -34,6 +36,7 @@ export const inativarNutricionista = async (req: Request, res: Response) => {
         await service.inativar(parseInt(id));
         return res.status(204).send();
     } catch (error: any) {
+        logger.error(error);
         return res.status(500).json({ error: 'Erro interno do servidor' });
     }
 }
@@ -44,6 +47,7 @@ export const reativarNutricionista = async (req: Request, res: Response) => {
         await service.reativar(parseInt(id));
         return res.status(204).send();
     } catch (error: any) {
+        logger.error(error);
         return res.status(500).json({ error: 'Erro interno do servidor' });
     }
 }
@@ -63,6 +67,7 @@ export const atualizarDadosNutricionista = async (req: Request, res: Response) =
     const nutricionistaAtualizado = await service.atualizar(parseInt(id), dto);
     return res.status(200).json(nutricionistaAtualizado);
   } catch (error: any) {
+    logger.error(error);
     if (error.message === 'Nutricionista não encontrado') {
       return res.status(404).json({ error: error.message });
     }
@@ -79,6 +84,7 @@ export const buscarNutricionista = async (req: Request, res: Response) => {
     const nutricionistas = await service.buscar(parseInt(id));
     return res.status(200).json(nutricionistas);
   } catch (error: any) {
+    logger.error(error);
     if(error.message == 'Nenhum nutricionista encontrado'){
       return res.status(404).json({ error: error.message });
     }

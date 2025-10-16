@@ -1,9 +1,6 @@
 import { IsNotEmpty, IsBoolean, IsOptional, Length } from 'class-validator';
 
 export class CriarHistoricoFamiliarDTO {
-  @IsNotEmpty()
-  paciente_id: number;
-
   @IsBoolean() historico_hipertensao: boolean;
   @IsBoolean() historico_diabetes: boolean;
   @IsBoolean() historico_dislipidemia: boolean;
