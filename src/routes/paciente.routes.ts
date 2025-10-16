@@ -3,6 +3,7 @@ import { criarPaciente, inativarPaciente, listarPacientes, buscarPacientePorId, 
 import { criarDadosDietetico, atualizarDadosDieteticosPaciente, buscarDieteticosPorPacienteId} from '../controllers/dietetico.controller';
 import {validarJWT} from '../middleware/auth.middleware'
 import { atualizarDadosEstiloVidaPaciente, buscarEstiloVidaPorPacienteId, criarEstiloVida } from '../controllers/estilo_vida.controller';
+import * as historicoFamiliarController from '../controllers/historico_familiar.controller'; 
 
 const router = Router();
 
@@ -20,5 +21,9 @@ router.get('/paciente/:paciente_id/dados-dieteticos',validarJWT, buscarDietetico
 router.post('/paciente/:paciente_id/estilo-vida',validarJWT, criarEstiloVida);
 router.put('/paciente/:paciente_id/estilo-vida',validarJWT, atualizarDadosEstiloVidaPaciente);
 router.get('/paciente/:paciente_id/estilo-vida',validarJWT, buscarEstiloVidaPorPacienteId);
+
+router.post('/paciente/:paciente_id/historico-familiar',validarJWT, historicoFamiliarController.criarHistoricoFamiliar);
+router.put('/paciente/:paciente_id/historico-familiar',validarJWT, historicoFamiliarController.atualizarHistoricoFamiliar);
+router.get('/paciente/:paciente_id/historico-familiar',validarJWT, historicoFamiliarController.buscarHistoricoFamiliarPorPacienteId);
 
 export default router;
