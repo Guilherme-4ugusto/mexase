@@ -4,12 +4,14 @@ import cors from 'cors';
 import nutricionistaRoutes from './routes/nutricionista.routes';
 import loginRoutes from './routes/login.routes';
 import pacienteRoutes from './routes/paciente.routes';
+import { requestLogger } from './middleware/requestLogger.middleware'
 
 
 dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(requestLogger);
 
 const PORT = process.env.PORT;
 

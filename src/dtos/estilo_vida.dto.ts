@@ -1,8 +1,7 @@
-import { IsNotEmpty, IsOptional, Length, IsBoolean, IsInt } from 'class-validator';
+import { IsOptional, Length, IsBoolean, IsInt, IsEnum } from 'class-validator';
+import { StatusTabagismo } from '../common/enums/status_tabagismo.enum';
 
 export class CriarEstilosVidaDTO {
-  @IsNotEmpty()
-  paciente_id: number;
 
   @IsOptional() @Length(0, 100)
   tipo_exercicio?: string;
@@ -16,8 +15,9 @@ export class CriarEstilosVidaDTO {
   @IsOptional() @Length(0, 100)
   orientacao_dieta?: string;
 
-  @IsOptional() @Length(0, 20)
-  tabagista_status?: string;
+  @IsOptional()
+  @IsEnum(StatusTabagismo, { message: 'O tabagista_status deve ser TABAGISTA, EX_TABAGISTA ou NAO_TABAGISTA' })
+  tabagista_status?: StatusTabagismo;
 
   @IsOptional() @IsBoolean()
   etilista?: boolean;

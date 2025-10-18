@@ -31,6 +31,87 @@ export class NutricionistaService {
     return nutricionistaSemSenha;
   }
 
+  async atualizar(id: number, { matricula, nome, email, senha }: Partial<CriarNutricionistaDTO>) {
+    const nutricionista = await prisma.nutricionista.findUnique({ where: { id } });
+
+    if (!nutricionista) {
+      throw new Error('Nutricionista não encontrado');
+    }
+
+    if (email || matricula) {
+      const existe = await prisma.nutricionista.findFirst({
+        where: {
+          OR: [
+            email ? { email } : undefined,
+            matricula ? { matricula } : undefined
+          ].filter(Boolean) as any,
+          NOT: { id }
+        },
+      });
+
+      if (existe) {
+        throw new Error('Email ou matrícula já cadastrados por outro nutricionista');
+      }
+    }
+
+    let senhaCriptografada: string | undefined;
+    if (senha) {
+      senhaCriptografada = await bcrypt.hash(senha, 10);
+    }
+
+    const atualizado = await prisma.nutricionista.update({
+      where: { id },
+      data: {
+        matricula,
+        nome,
+        email,
+        senha: senhaCriptografada,
+      },
+    });
+
+    const { senha: _, ...nutricionistaSemSenha } = atualizado;
+    return nutricionistaSemSenha;
+  }
+
+  async buscar( id : number) {
+    if(id){
+      const nutricionista = await prisma.nutricionista.findUnique({
+        select: {
+          id: true,
+          nome: true,
+          email: true,
+          matricula: true,
+          criadoEm: true,
+        },
+        where: {
+          id
+        }
+      })
+
+      if(!nutricionista){
+        throw new Error('Nenhum nutricionista encontrado');
+      }
+
+      return nutricionista;
+    } else {
+      const nutricionistas = await prisma.nutricionista.findMany({
+        select: {
+          id: true,
+          nome: true,
+          email: true,
+          matricula: true,
+          criadoEm: true,
+        },
+      });
+
+      if(!nutricionistas){
+        throw new Error('Nenhum nutricionista encontrado');
+      }
+
+      return nutricionistas;
+    }
+  }
+
   async inativar( id : number) {
     await prisma.nutricionista.update({
       where: {

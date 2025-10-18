@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { DieteticoService } from '../services/dietetico.service';
 import { AppException } from '../common/exceptions/app.exception';
-import { CriarDadosDieteticosDTO } from '../dtos/dados_dieteticos_dto';
+import { EstiloVidaService } from '../services/estilo_vida.service';
+import { CriarEstilosVidaDTO } from '../dtos/estilo_vida.dto';
 import { logger } from '../utils/logger';
 
-const service = new DieteticoService();
+const service = new EstiloVidaService();
 
-export const criarDadosDietetico = async (req: Request, res: Response) => {
-  const dto = plainToInstance(CriarDadosDieteticosDTO, req.body);
+export const criarEstiloVida = async (req: Request, res: Response) => {
+  const dto = plainToInstance(CriarEstilosVidaDTO, req.body);
   const { paciente_id } = req.params
 
   const erros = await validate(dto);
@@ -20,8 +20,8 @@ export const criarDadosDietetico = async (req: Request, res: Response) => {
   }
 
   try {
-    const novoDietetico = await service.criar(parseInt(paciente_id), dto);
-    return res.status(201).json(novoDietetico);
+    const novoEstiloVida = await service.criar(parseInt(paciente_id), dto);
+    return res.status(201).json(novoEstiloVida);
   } catch (error: any) {
     logger.error(error);
     if (error instanceof AppException) {
@@ -33,11 +33,11 @@ export const criarDadosDietetico = async (req: Request, res: Response) => {
 };
 
 
-export const buscarDieteticosPorPacienteId = async (req: Request, res: Response) => {
+export const buscarEstiloVidaPorPacienteId = async (req: Request, res: Response) => {
   try {
     const { paciente_id } = req.params
-    const dietetico = await service.buscarDieteticosPorPacienteId(parseInt(paciente_id));
-    return res.status(200).send(dietetico);
+    const estiloVida = await service.buscarEstiloVidaPorPacienteId(parseInt(paciente_id));
+    return res.status(200).send(estiloVida);
   } catch (error: any) {
     logger.error(error);
     if (error instanceof AppException) {
@@ -48,9 +48,9 @@ export const buscarDieteticosPorPacienteId = async (req: Request, res: Response)
   }
 }
 
-export const atualizarDadosDieteticosPaciente = async (req: Request, res: Response) => {
+export const atualizarDadosEstiloVidaPaciente = async (req: Request, res: Response) => {
   const { paciente_id } = req.params;
-  const dto = plainToInstance(CriarDadosDieteticosDTO, req.body);
+  const dto = plainToInstance(CriarEstilosVidaDTO, req.body);
 
   const erros = await validate(dto);
   if (erros.length > 0) {
@@ -59,8 +59,8 @@ export const atualizarDadosDieteticosPaciente = async (req: Request, res: Respon
   }
 
   try {
-    const dieteticoAtualizado = await service.atualizar(parseInt(paciente_id), dto);
-    return res.status(200).json(dieteticoAtualizado);
+    const estiloVidaAtualizado = await service.atualizar(parseInt(paciente_id), dto);
+    return res.status(200).json(estiloVidaAtualizado);
   } catch (error: any) {
     logger.error(error);
     if (error instanceof AppException) {
@@ -69,4 +69,3 @@ export const atualizarDadosDieteticosPaciente = async (req: Request, res: Respon
     return res.status(500).json({ error: 'Erro interno do servidor' });
   }
 };
-

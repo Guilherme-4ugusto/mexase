@@ -143,7 +143,7 @@ model EstilosVida {
   duracao_exercicio_minutos  Int?
   orientacao_dieta           String?  @db.VarChar(100)
   tabagista_status           String?  @db.VarChar(20)
-  etilista                   Boolean
+  etilista                   Boolean  @default(false)
   duracao_etilismo_anos      Int?
   frequencia_etilismo        String?  @db.VarChar(50)
   problema_denticao          Boolean  @default(false)
