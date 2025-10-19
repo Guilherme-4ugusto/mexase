@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { criarNutricionista, inativarNutricionista, reativarNutricionista} from '../controllers/nutricionista.controller';
+import * as nutricionistaController from '../controllers/nutricionista.controller';
 import {validarJWT} from '../middleware/auth.middleware'
 
 const router = Router();
 
-router.post('/nutricionista', validarJWT, criarNutricionista);
-router.patch('/nutricionista/:id/inativar', validarJWT, inativarNutricionista)
-router.patch('/nutricionista/:id/reativar', validarJWT, reativarNutricionista)
-
+router.post('/nutricionista', validarJWT, nutricionistaController.criarNutricionista);
+router.put('/nutricionista/:id', validarJWT, nutricionistaController.atualizarDadosNutricionista);
+router.patch('/nutricionista/:id/inativar', validarJWT, nutricionistaController.inativarNutricionista);
+router.patch('/nutricionista/:id/reativar', validarJWT, nutricionistaController.reativarNutricionista);
+router.get('/nutricionista/:id?', validarJWT, nutricionistaController.buscarNutricionista);
 export default router;

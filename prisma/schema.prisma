@@ -27,8 +27,8 @@ model Nutricionista {
 
 model Consulta {
   id                     Int      @id @default(autoincrement())
-  eliminacao_intestinal   String?  @db.VarChar(60)
-  frequencia_evacuatoria  String?  @db.VarChar(60)
+  eliminacao_intestinal   String? @db.VarChar(60)
+  frequencia_evacuatoria  String? @db.VarChar(60)
   peso_atual              Float?
   peso_habitual           Float?
   estatura                Float?
@@ -46,36 +46,35 @@ model Consulta {
   ambc                    Float?
   cmb                     Float?
   somatorio_dobras        Float?
-
+  id_diagnostico          Int
   id_nutricionista        Int
   id_paciente             Int
+  id_dados_bioquimicos    Int
+  id_recordatorio         Int
 
-  nutricionista     Nutricionista   @relation(fields: [id_nutricionista], references: [id])
-  paciente          Paciente        @relation(fields: [id_paciente], references: [id])
-  classificacao     Classificacao?   @relation("ConsultaClassificacao")
-  diagnostico       Diagnostico?     @relation("ConsultaDiagnostico")
-  dadosBioquimicos  DadosBioquimicos? @relation("ConsultaDadosBioquimicos")
-  recordatorios     Recordatorio[]    @relation("ConsultaRecordatorio")
+  nutricionista  Nutricionista  @relation(fields: [id_nutricionista], references: [id])
+  paciente       Paciente       @relation(fields: [id_paciente], references: [id])
+  diagnostico    Diagnostico    @relation(fields: [id_diagnostico], references: [id])
+  dadosBioquimicos DadosBioquimicos @relation(fields: [id_dados_bioquimicos], references: [id])
+  recordatorio   Recordatorio   @relation(fields: [id_recordatorio], references: [id])
+  classificacoes Classificacao[]
 }
-
 
 model Classificacao {
-  id                   Int       @id @default(autoincrement())
-  consulta_id          Int       @unique
-  parametro            String?   @db.VarChar(50)
-  valor_classificacao  String?   @db.VarChar(100)
+  id                  Int      @id @default(autoincrement())
+  consulta_id         Int
+  parametro           String   @db.VarChar(50)
+  valor_classificacao String   @db.VarChar(100)
 
-  consulta Consulta @relation("ConsultaClassificacao", fields: [consulta_id], references: [id])
+  consulta Consulta @relation(fields: [consulta_id], references: [id])
 }
-
 
 model Diagnostico {
   id                        Int     @id @default(autoincrement())
   diagnostico_nutricional   String? @db.VarChar(400)
   diagnostico_dietoterapia  String? @db.VarChar(400)
   conduta_nutricional       String? @db.VarChar(400)
-  consulta_id          Int       @unique
-  consulta Consulta @relation("ConsultaDiagnostico", fields: [consulta_id], references: [id])
+  consultas                 Consulta[]
 }
 
 model Paciente {
@@ -102,8 +101,7 @@ model DadosBioquimicos {
   id           Int    @id @default(autoincrement())
   hemoglobina  Float?
   hematocrito  Float?
-  consulta_id          Int       @unique
-  consulta Consulta @relation("ConsultaDadosBioquimicos", fields: [consulta_id], references: [id])
+  consultas    Consulta[]
   @@map("dados_bioquimicos")
 }
 
@@ -113,10 +111,9 @@ model Recordatorio {
   frequencia        String  @db.Char(1)
   observacao        String? @db.VarChar(250)
   id_grupo_alimentar Int
-  consulta_id          Int       @unique
 
   grupoAlimentar GrupoAlimentar @relation(fields: [id_grupo_alimentar], references: [id])
-  consulta Consulta @relation("ConsultaRecordatorio", fields: [consulta_id], references: [id])
+  consultas      Consulta[]
 }
 
 model GrupoAlimentar {
