@@ -2,25 +2,25 @@ import { IsNotEmpty, Length, IsEmail, IsOptional, IsEnum, IsDate, Matches} from 
 import { Sexo } from '../common/enums/sexo.enum';
 
 export class CriarPacienteDTO {
-  @IsNotEmpty({ message: 'O nome é obrigatório' })
+  @IsNotEmpty({ message: 'O nome Ã© obrigatÃ³rio' })
   @Length(2, 150, { message: 'O nome deve ter entre 2 e 150 caracteres' })
   nome: string;
 
-  @IsEmail({}, { message: 'O email deve ser válido' })
+  @IsEmail({}, { message: 'O email deve ser vÃ¡lido' })
   @Length(5, 254, { message: 'O email deve ter entre 5 e 254 caracteres' })
   email: string;
 
-  @Length(11, 11, { message: 'CPF inválido!' })
+  @Length(11, 11, { message: 'CPF invÃ¡lido!' })
   cpf: string;
 
-  @IsNotEmpty({ message: 'A data de nascimento é obrigatória' })
+  @IsNotEmpty({ message: 'A data de nascimento Ã© obrigatÃ³ria' })
   @Matches(/^\d{4}-\d{2}-\d{2}$/, {
   message: 'A data de nascimento deve estar no formato YYYY-MM-DD',
   })
   data_nascimento: string;
 
   @IsOptional()
-  @Length(8, 11, { message: 'O telefone deve ter entre 8 e 11 dígitos' })
+  @Length(8, 11, { message: 'O telefone deve ter entre 8 e 11 dï¿½gitos' })
   telefone?: string;
 
   @IsOptional()
@@ -31,6 +31,6 @@ export class CriarPacienteDTO {
   @Length(2, 60, { message: 'A naturalidade deve ter entre 2 e 60 caracteres' })
   naturalidade?: string;
 
-  @IsNotEmpty({ message: 'O setor é obrigatório' })
+  @IsNotEmpty({ message: 'O setor Ã© obrigatÃ³rio' })
   cd_setor: number;
 }
