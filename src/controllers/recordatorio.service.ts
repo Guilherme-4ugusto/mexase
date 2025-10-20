@@ -47,6 +47,8 @@ export const atualizarRecordatorio = async (req: Request, res: Response) => {
         return res.status(200).json(novoRecordatorio);
     } catch (error: any) {
         logger.error(error);
+        return res.status(201).json(novoRecordatorio);
+    } catch (error: any) {
         if (error instanceof AppException) {
             return res.status(error.statusCode).json({ error: error.message });
         }
