@@ -25,10 +25,6 @@ export class CriarConsultaDTO {
   @IsOptional() @IsNumber() cmb?: number;
   @IsOptional() @IsNumber() somatorio_dobras?: number;
 
-  @IsNotEmpty() id_classificacao: number;
-  @IsNotEmpty() id_diagnostico: number;
   @IsNotEmpty() id_nutricionista: number;
   @IsNotEmpty() id_paciente: number;
-  @IsNotEmpty() id_dados_bioquimicos: number;
-  @IsNotEmpty() id_recordatorio: number;
 }

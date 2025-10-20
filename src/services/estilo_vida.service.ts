@@ -1,5 +1,4 @@
 import { prisma } from '../prisma/client';
-import { CriarDadosDieteticosDTO } from '../dtos/dados_dieteticos_dto';
 import { PacienteNaoEncontradoException } from '../common/exceptions/paciente/paciente_nao_encontrado.exception';
 import { EstiloVidaJaCadastradoException } from '../common/exceptions/estilo_vida/estilo_vida_ja_cadastrado.exception';
 import { EstiloVidaNaoEncontradoException } from '../common/exceptions/estilo_vida/estilo_vida_nao_encontrado.exception';
@@ -128,6 +127,9 @@ export class EstiloVidaService {
         const dadosEstiloVida = await prisma.estilosVida.findUnique({
             where: { paciente_id },
         });
+        if(!dadosEstiloVida){
+            throw new EstiloVidaNaoEncontradoException();
+        }
         return dadosEstiloVida;
     }
 }
