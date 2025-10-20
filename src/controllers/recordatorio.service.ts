@@ -4,6 +4,7 @@ import { validate } from 'class-validator';
 import { AppException } from '../common/exceptions/app.exception';
 import { RecordatorioService } from '../services/recordatorio.service';
 import { CriarRecordatorioDTO } from '../dtos/recordatorio.dto';
+import { logger } from '../utils/logger';
 
 const service = new RecordatorioService();
 
@@ -22,6 +23,7 @@ export const criarRecordatorio = async (req: Request, res: Response) => {
         const novoRecordatorio = await service.criar(parseInt(consulta_id), dto);
         return res.status(201).json(novoRecordatorio);
     } catch (error: any) {
+        logger.error(error);
         if (error instanceof AppException) {
             return res.status(error.statusCode).json({ error: error.message });
         }
@@ -42,8 +44,9 @@ export const atualizarRecordatorio = async (req: Request, res: Response) => {
 
     try {
         const novoRecordatorio = await service.atualizar(parseInt(consulta_id), dto);
-        return res.status(201).json(novoRecordatorio);
+        return res.status(200).json(novoRecordatorio);
     } catch (error: any) {
+        logger.error(error);
         if (error instanceof AppException) {
             return res.status(error.statusCode).json({ error: error.message });
         }
@@ -58,10 +61,10 @@ export const buscarRecordatorioPorConsultaId = async (req: Request, res: Respons
     const recordatorioAtualizado = await service.buscarRecordatorioPorConsultaId(parseInt(consulta_id));
     return res.status(200).send(recordatorioAtualizado);
   } catch (error: any) {
+    logger.error(error);
     if (error instanceof AppException) {
       return res.status(error.statusCode).json({ error: error.message });
     }
-    console.log(error);
     return res.status(500).json({ error: 'Erro interno do servidor' });
   }
 }
