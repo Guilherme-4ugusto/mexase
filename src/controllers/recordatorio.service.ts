@@ -46,7 +46,6 @@ export const atualizarRecordatorio = async (req: Request, res: Response) => {
         const novoRecordatorio = await service.atualizar(parseInt(consulta_id), dto);
         return res.status(200).json(novoRecordatorio);
     } catch (error: any) {
-        logger.error(error);
         if (error instanceof AppException) {
             return res.status(error.statusCode).json({ error: error.message });
         }

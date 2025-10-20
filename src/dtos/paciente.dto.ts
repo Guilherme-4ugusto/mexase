@@ -20,7 +20,7 @@ export class CriarPacienteDTO {
   data_nascimento: string;
 
   @IsOptional()
-  @Length(8, 11, { message: 'O telefone deve ter entre 8 e 11 d�gitos' })
+  @Length(8, 11, { message: 'O telefone deve ter entre 8 e 11 dígitos' })
   telefone?: string;
 
   @IsOptional()
