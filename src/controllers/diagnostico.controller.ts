@@ -2,14 +2,14 @@ import { Request, Response } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { AppException } from '../common/exceptions/app.exception';
-import { RecordatorioService } from '../services/recordatorio.service';
-import { CriarRecordatorioDTO } from '../dtos/recordatorio.dto';
+import { DiagnosticoService } from '../services/diagnostico.service';
+import { CriarDiagnosticoDTO } from '../dtos/diagnostico.dto';
 import { logger } from '../utils/logger';
 
-const service = new RecordatorioService();
+const service = new DiagnosticoService();
 
-export const criarRecordatorio = async (req: Request, res: Response) => {
-    const dto = plainToInstance(CriarRecordatorioDTO, req.body);
+export const criarDiagnostico = async (req: Request, res: Response) => {
+    const dto = plainToInstance(CriarDiagnosticoDTO, req.body);
     const { consulta_id } = req.params
 
     const erros = await validate(dto);
@@ -20,8 +20,8 @@ export const criarRecordatorio = async (req: Request, res: Response) => {
     }
 
     try {
-        const novoRecordatorio = await service.criar(parseInt(consulta_id), dto);
-        return res.status(201).json(novoRecordatorio);
+        const novoDiagnostico = await service.criar(parseInt(consulta_id), dto);
+        return res.status(201).json(novoDiagnostico);
     } catch (error: any) {
         logger.error(error);
         if (error instanceof AppException) {
@@ -31,8 +31,8 @@ export const criarRecordatorio = async (req: Request, res: Response) => {
     }
 }
 
-export const atualizarRecordatorio = async (req: Request, res: Response) => {
-    const dto = plainToInstance(CriarRecordatorioDTO, req.body);
+export const atualizarDiagnostico = async (req: Request, res: Response) => {
+    const dto = plainToInstance(CriarDiagnosticoDTO, req.body);
     const { consulta_id } = req.params
 
     const erros = await validate(dto);
@@ -43,8 +43,8 @@ export const atualizarRecordatorio = async (req: Request, res: Response) => {
     }
 
     try {
-        const novoRecordatorio = await service.atualizar(parseInt(consulta_id), dto);
-        return res.status(200).json(novoRecordatorio);
+        const novoDiagnostico = await service.atualizar(parseInt(consulta_id), dto);
+        return res.status(200).json(novoDiagnostico);
     } catch (error: any) {
         logger.error(error);
         if (error instanceof AppException) {
@@ -55,11 +55,11 @@ export const atualizarRecordatorio = async (req: Request, res: Response) => {
 }
 
 
-export const buscarRecordatorioPorConsultaId = async (req: Request, res: Response) => {
+export const buscarDiagnosticoPorConsultaId = async (req: Request, res: Response) => {
   try {
     const { consulta_id } = req.params
-    const recordatorioAtualizado = await service.buscarRecordatorioPorConsultaId(parseInt(consulta_id));
-    return res.status(200).send(recordatorioAtualizado);
+    const diagnosticoAtualizado = await service.buscarDiagnosticoPorConsultaId(parseInt(consulta_id));
+    return res.status(200).send(diagnosticoAtualizado);
   } catch (error: any) {
     logger.error(error);
     if (error instanceof AppException) {
