@@ -3,6 +3,9 @@ import { atualizarRecordatorio, buscarRecordatorioPorConsultaId, criarRecordator
 import { validarJWT } from '../middleware/auth.middleware';
 import { atualizarConsultaPorIdConsulta, buscarConsultaPorIdConsulta, criarConsulta } from '../controllers/consulta.controller';
 import { atualizarDiagnostico, buscarDiagnosticoPorConsultaId, criarDiagnostico } from '../controllers/diagnostico.controller';
+import * as dadosBioquimicosController from '../controllers/dados_bioquimicos.controller'; 
+import * as classificacaoController from '../controllers/classificacao.controller'; 
+
 
 const router = Router();
 
@@ -17,5 +20,13 @@ router.get('/consulta/:consulta_id/diagnostico', validarJWT, buscarDiagnosticoPo
 router.post('/consulta', validarJWT, criarConsulta);
 router.put('/consulta/:consulta_id', validarJWT, atualizarConsultaPorIdConsulta);
 router.get('/consulta/:consulta_id', validarJWT, buscarConsultaPorIdConsulta);
+
+router.post('/consulta/:consulta_id/dados-bioquimicos', validarJWT, dadosBioquimicosController.criarDadosBioquimicos);
+router.put('/consulta/:consulta_id/dados-bioquimicos', validarJWT, dadosBioquimicosController.atualizarDadosBioquimicos);
+router.get('/consulta/:consulta_id/dados-bioquimicos', validarJWT, dadosBioquimicosController.buscarDadosBioquimicosPorConsultaId);
+
+router.post('/consulta/:consulta_id/dados-bioquimicos', validarJWT, classificacaoController.criarClassificacao);
+router.put('/consulta/:consulta_id/dados-bioquimicos', validarJWT, classificacaoController.atualizarClassificao);
+router.get('/consulta/:consulta_id/dados-bioquimicos', validarJWT, classificacaoController.buscarClassificacoesPorConsultaId);
 
 export default router;

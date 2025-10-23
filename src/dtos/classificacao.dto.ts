@@ -1,12 +1,10 @@
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsEnum, IsNotEmpty, Length } from 'class-validator';
+import { Classificacao } from '../common/enums/classificacao.enum';
 
 export class CriarClassificacaoDTO {
-  @IsNotEmpty({ message: 'Consulta é obrigatória' })
-  consulta_id: number;
-
   @IsNotEmpty({ message: 'Parâmetro é obrigatório' })
-  @Length(2, 50)
-  parametro: string;
+  @IsEnum(Classificacao, { message: 'Parâmetro inválido' })
+  parametro: Classificacao;
 
   @IsNotEmpty({ message: 'Valor de classificação é obrigatório' })
   @Length(2, 100)
