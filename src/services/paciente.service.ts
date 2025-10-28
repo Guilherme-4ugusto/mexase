@@ -66,24 +66,48 @@ export class PacienteService {
     return
   }
 
-  async listarPacientes(page: number, limit: number) {
-    const totalItems = await prisma.paciente.count({
-      where: { desativadoEm: null },
-    });
+  async listarPacientes(page: number, limit: number, filtros: any) {
 
     const pacientes = await prisma.paciente.findMany({
       where: {
+        ...filtros,
         desativadoEm: null,
       },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: { nome: 'asc' },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        cpf: true,
+        data_nascimento: true,
+        telefone: true,
+        sexo: true,
+        naturalidade: true,
+        criadoEm: true,
+        desativadoEm: true,
+        setor: {
+          select: {
+            nome: true,
+          },
+        },
+      },
     });
+
+
+    const totalItems = Object.keys(filtros).length > 0 ? await prisma.paciente.count({ where: { ...filtros } }) : await prisma.paciente.count({ where: { desativadoEm: null }, });
 
     const totalPages = Math.ceil(totalItems / limit);
 
+    const pacientesComNomeSetor = pacientes.map(p => ({
+      ...p,
+      nome_setor: p.setor.nome,
+      setor: undefined,
+    }));
+
     return {
-      data: pacientes,
+      data: pacientesComNomeSetor,
       meta: {
         totalItems,
         totalPages,

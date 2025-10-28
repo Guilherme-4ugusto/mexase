@@ -6,6 +6,7 @@ import loginRoutes from './routes/login.routes';
 import pacienteRoutes from './routes/paciente.routes';
 import { requestLogger } from './middleware/requestLogger.middleware'
 import consultaRoutes from './routes/consulta.route';
+import setorRoutes from './routes/setor.route';
 
 
 dotenv.config();
@@ -20,6 +21,7 @@ app.use('/api', nutricionistaRoutes);
 app.use('/api', loginRoutes);
 app.use('/api', pacienteRoutes);
 app.use('/api', consultaRoutes);
+app.use('/api', setorRoutes);
 
 
 app.listen(PORT, () => { 

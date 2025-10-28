@@ -63,8 +63,14 @@ export const listarPacientes = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    
-    const pacientes = await service.listarPacientes(page, limit);
+    const nome = req.query.nome as string;
+    const cpf = req.query.cpf as string;
+    const email = req.query.email as string;
+    const filtros: any = {};
+    if (nome) filtros.nome = { contains: nome};
+    if (cpf) filtros.cpf = { startsWith: cpf};
+    if(email) filtros.email = { startsWith: email };
+    const pacientes = await service.listarPacientes(page, limit, filtros);
     return res.status(200).json(pacientes);
   } catch (error: any) {
     logger.error(error);
