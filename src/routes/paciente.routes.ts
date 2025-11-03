@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { criarPaciente, inativarPaciente, listarPacientes, buscarPacientePorId, atualizarDadosPaciente, ativarPaciente} from '../controllers/paciente.controller';
+import { criarPaciente, inativarPaciente, listarPacientes, buscarPacientePorId, atualizarDadosPaciente, ativarPaciente, buscarTotalDePacientesPorSexo} from '../controllers/paciente.controller';
 import { criarDadosDietetico, atualizarDadosDieteticosPaciente, buscarDieteticosPorPacienteId} from '../controllers/dietetico.controller';
 import {validarJWT} from '../middleware/auth.middleware'
 import { atualizarDadosEstiloVidaPaciente, buscarEstiloVidaPorPacienteId, criarEstiloVida } from '../controllers/estilo_vida.controller';
@@ -28,5 +28,7 @@ router.put('/paciente/:paciente_id/historico-familiar',validarJWT, historicoFami
 router.get('/paciente/:paciente_id/historico-familiar',validarJWT, historicoFamiliarController.buscarHistoricoFamiliarPorPacienteId);
 
 router.get('/paciente/:paciente_id/consultas', validarJWT, buscarConsultasPorIdPaciente)
+
+router.get('/pacientes/por-genero', validarJWT, buscarTotalDePacientesPorSexo);
 
 export default router;

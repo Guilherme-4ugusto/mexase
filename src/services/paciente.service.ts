@@ -83,6 +83,7 @@ export class PacienteService {
         cpf: true,
         data_nascimento: true,
         telefone: true,
+        
         sexo: true,
         naturalidade: true,
         criadoEm: true,
@@ -158,6 +159,38 @@ export class PacienteService {
 
     return atualizado;
   }
+
+  async totalPacientesPorGenero(filtros: any) {
+    const resultado = await prisma.paciente.groupBy({
+      by: ['sexo'],
+      where: {
+        ...filtros,
+        desativadoEm: null,
+      },
+      _count: { _all: true },
+    });
+
+    const campos: Record<'M' | 'F' | 'O', string> = {
+      M: 'Masculino',
+      F: 'Feminino',
+      O: 'Outro',
+    };
+
+    const base: Record<'M' | 'F' | 'O', number> = { M: 0, F: 0, O: 0 };
+
+    for (const item of resultado) {
+      const sexo = (item.sexo ?? 'O') as 'M' | 'F' | 'O';
+      base[sexo] = item._count._all;
+    }
+
+    return [
+      { genero: campos.F, total: base.F },
+      { genero: campos.M, total: base.M },
+      { genero: campos.O, total: base.O },
+    ];
+  }
+
+
 }
 
 
