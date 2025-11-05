@@ -190,7 +190,25 @@ export class PacienteService {
     ];
   }
 
+  async totalPacientesPorSetor() {
+    const resultado = await prisma.paciente.groupBy({
+        by: ["cd_setor"],
+        _count: { id: true },
+      })
 
+      const setores = await prisma.setor.findMany({
+        select: { cd_setor: true, nome: true },
+      })
+
+      const dados = setores.map((setor) => {
+        const item = resultado.find((r) => r.cd_setor === setor.cd_setor)
+        return {
+          setor: setor.nome,
+          total: item?._count.id ?? 0,
+        }
+      })
+
+      return dados
+  }
 }
-
 
