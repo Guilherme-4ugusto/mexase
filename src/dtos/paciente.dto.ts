@@ -24,7 +24,7 @@ export class CriarPacienteDTO {
   telefone?: string;
 
   @IsOptional()
-  @IsEnum(Sexo, { message: 'O sexo deve ser F (Feminino) ou M (Masculino)' })
+  @IsEnum(Sexo, { message: 'O sexo deve ser F (Feminino), M (Masculino) ou O (Outros)' })
   sexo?: Sexo;
 
   @IsOptional()
