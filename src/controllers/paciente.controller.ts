@@ -114,3 +114,28 @@ export const atualizarDadosPaciente = async (req: Request, res: Response) => {
   }
 };
 
+export const buscarTotalDePacientesPorSexo = async (req: Request, res: Response) => {
+  try {
+    const filtros = req.query || {};
+
+    const pacientesPorGenero = await service.totalPacientesPorGenero(filtros);
+
+    return res.status(200).json(pacientesPorGenero);
+  } catch (error: any) {
+    logger.error("Erro ao buscar total de pacientes por gênero:", error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
+  }
+};
+
+export const buscarTotalDePacientesPorSetor = async (req: Request, res: Response) => {
+  try {
+    const filtros = req.query || {};
+
+    const pacientesPorSetor = await service.totalPacientesPorSetor();
+
+    return res.status(200).json(pacientesPorSetor);
+  } catch (error: any) {
+    logger.error("Erro ao buscar total de pacientes por setor:", error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
+  }
+};

@@ -18,7 +18,10 @@ model Nutricionista {
   matricula    Int      @unique
   nome         String   @db.VarChar(150)
   email        String   @unique @db.VarChar(254)
+  telefone     String?  @db.VarChar(11)
   senha        String
+  isAdmin     Boolean  @default(false)
+  isTemaDark  Boolean  @default(false)
   criadoEm     DateTime @default(now())
   desativadoEm DateTime?
 

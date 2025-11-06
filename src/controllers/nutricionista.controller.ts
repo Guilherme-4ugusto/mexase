@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { NutricionistaService } from '../services/nutricionista.service';
-import { CriarNutricionistaDTO } from '../dtos/nutricionista.dto';
+import { AlterarSenhaNutricionistaDTO, CriarNutricionistaDTO } from '../dtos/nutricionista.dto';
 import { logger } from '../utils/logger';
 
 const service = new NutricionistaService();
@@ -85,9 +85,66 @@ export const buscarNutricionista = async (req: Request, res: Response) => {
     return res.status(200).json(nutricionistas);
   } catch (error: any) {
     logger.error(error);
+    if(error.message == 'Nutricionista não encontrado'){
+      return res.status(404).json({ error: error.message });
+    }
+    return res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+}
+
+export const buscarNutricionistas = async (req: Request, res: Response) => {
+  try{
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const nome = req.query.nome as string;
+    const matricula = parseInt(req.query.matricula as string);
+    const email = req.query.email as string;
+    const filtros: any = {};
+    if (nome) filtros.nome = { contains: nome};
+    if (matricula) filtros.matricula = matricula;
+    if(email) filtros.email = { startsWith: email };
+
+    const nutricionistas = await service.buscarTodos(page, limit, filtros);
+    return res.status(200).json(nutricionistas);
+  } catch (error: any) {
+    logger.error(error);
     if(error.message == 'Nenhum nutricionista encontrado'){
       return res.status(404).json({ error: error.message });
     }
     return res.status(500).json({ error: 'Erro interno do servidor' });
   }
+}
+
+export const alterarSenhaNutricionista = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const dto = plainToInstance(AlterarSenhaNutricionistaDTO, req.body);
+
+  const erros = await validate(dto);
+
+  if (erros.length > 0) {
+    const mensagens = erros.map(e => Object.values(e.constraints || {})).flat();
+    return res.status(400).json({ errors: mensagens });
+  }
+
+  try {
+    const nutricionistaAtualizado = await service.alterarSenha(parseInt(id), dto);
+    return res.status(200).json(nutricionistaAtualizado);
+  } catch (error: any) {
+    logger.error(error);
+    if (error.message === 'Nutricionista não encontrado') {
+      return res.status(404).json({ error: error.message });
+    }
+    return res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+}
+
+export const alterarTemaDoNutricionista = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params
+        await service.alterarTema(parseInt(id));
+        return res.status(204).send();
+    } catch (error: any) {
+        logger.error(error);
+        return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
 }
