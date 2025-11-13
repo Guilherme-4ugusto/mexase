@@ -3,6 +3,7 @@ import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 export class CriarConsultaDTO {
   @IsOptional() eliminacao_intestinal?: string;
   @IsOptional() frequencia_evacuatoria?: string;
+  @IsOptional() objetivo_consulta?: string;
   
   @IsOptional() @IsNumber() peso_atual?: number;
   @IsOptional() @IsNumber() peso_habitual?: number;

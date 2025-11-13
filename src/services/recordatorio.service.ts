@@ -1,98 +1,105 @@
-import { prisma } from '../prisma/client';
-import { CriarRecordatorioDTO } from "../dtos/recordatorio.dto";
-import { ConsultaNaoEncontradoException } from '../common/exceptions/consulta/consulta_nao_encontrado.exception';
-import { RecordatorioNaoEncontradoException } from '../common/exceptions/recordatorio/recordatorio_nao_encontrado.exception';
-import { GrupoAlimentarNaoEncontradoException } from '../common/exceptions/grupo_alimentar/grupo_alimentar_nao_encontrado.exception';
+import { PrismaClient } from '@prisma/client';
+import { CriarRecordatorioDTO } from '../dtos/recordatorio.dto';
+import { AppException } from '../common/exceptions/app.exception';
 
+const prisma = new PrismaClient();
 
 export class RecordatorioService {
 
-    async criar(
-        consulta_id: number,
-        {
-            frequencia,
-            horario_refeicao,
-            id_grupo_alimentar,
-            observacao
-        }:CriarRecordatorioDTO 
+  /**
+   * Cria múltiplos recordatórios para uma consulta.
+   */
+  async criarVarios(consultaId: number, dtos: CriarRecordatorioDTO[]) {
+    // Verifica se a consulta existe
+    const consulta = await prisma.consulta.findUnique({
+      where: { id: consultaId },
+    });
 
-    ){
-
-        const consulta = await prisma.consulta.findUnique({
-            where : {id : consulta_id}
-        })
-
-        if(!consulta){
-            throw new ConsultaNaoEncontradoException();
-        }
-
-        const grupoAlimento = await prisma.grupoAlimentar.findFirst({
-            where : {id : id_grupo_alimentar}
-        })
-
-        if(!grupoAlimento){
-            throw new GrupoAlimentarNaoEncontradoException();
-        }
-
-        return await prisma.recordatorio.create({
-            data: {
-                consulta_id,
-                frequencia,
-                horario_refeicao,
-                id_grupo_alimentar,
-                observacao
-            },
-        });
-
+    if (!consulta) {
+      throw new AppException('Consulta não encontrada.', 404);
     }
 
-    async atualizar(
-        consulta_id: number,
-        {
-            frequencia,
-            horario_refeicao,
-            id_grupo_alimentar,
-            observacao
-        }:CriarRecordatorioDTO 
+    // Transação para garantir consistência (tudo ou nada)
+    return await prisma.$transaction(async (tx) => {
+      const recordatoriosCriados = [];
 
-    ){
-
-        const consulta = await prisma.consulta.findUnique({
-            where : {id : consulta_id}
-        })
-
-        if(!consulta){
-            throw new RecordatorioNaoEncontradoException();
-        }
-
-        const grupoAlimento = await prisma.grupoAlimentar.findFirst({
-            where : {id : id_grupo_alimentar}
-        })
-
-        if(!grupoAlimento){
-            throw new GrupoAlimentarNaoEncontradoException();
-        }
-
-        return await prisma.recordatorio.update({
-            where: { consulta_id },
-            data: {
-                frequencia,
-                horario_refeicao,
-                id_grupo_alimentar,
-                observacao
-            },
+      for (const dto of dtos) {
+        const recordatorio = await tx.recordatorio.create({
+          data: {
+            tipo_refeicao: dto.tipo_refeicao,
+            horario_refeicao: dto.horario_refeicao,
+            frequencia: dto.frequencia,
+            observacao: dto.observacao,
+            alimentos_consumidos: dto.alimentos_consumidos,
+            dia_semana: dto.dia_semana,
+            consulta_id: consultaId,
+          },
         });
+
+        if (dto.grupos_alimentares_ids?.length) {
+          await tx.recordatorioGrupo.createMany({
+            data: dto.grupos_alimentares_ids.map((id) => ({
+              id_recordatorio: recordatorio.id,
+              id_grupo_alimentar: id,
+            })),
+          });
+        }
+
+        const recordatorioCompleto = await tx.recordatorio.findUnique({
+          where: { id: recordatorio.id },
+          include: {
+            grupos: { include: { grupo_alimentar: true } },
+          },
+        });
+
+        recordatoriosCriados.push(recordatorioCompleto);
+      }
+
+      return recordatoriosCriados;
+    });
+  }
+
+  /**
+   * Atualiza múltiplos recordatórios (se necessário).
+   * Pode ser implementado no futuro.
+   */
+  async atualizarVarios(consulta_id: number, dtos: CriarRecordatorioDTO[]) {
+    const recordatorio = await prisma.recordatorio.findFirst({
+      where: { consulta_id },
+    })
+    // Estratégia: apagar os existentes e recriar todos.
+    try {
+      await prisma.recordatorioGrupo.deleteMany({
+        where: { id_recordatorio: recordatorio?.id },
+      })
+    } catch {
     }
 
-
-    async buscarRecordatorioPorConsultaId(consulta_id: number) {
-        const recordatorio = await prisma.recordatorio.findUnique({
-            where: { consulta_id },
-        });
-        if(!recordatorio){
-            throw new RecordatorioNaoEncontradoException();
-        }
-        return recordatorio;
+    try {
+      await prisma.recordatorio.deleteMany({
+        where: { consulta_id },
+      });
+    } catch {
     }
-    
+
+    return this.criarVarios(consulta_id, dtos);
+  }
+
+  /**
+   * Busca todos os recordatórios de uma consulta.
+   */
+  async buscarPorConsultaId(consultaId: number) {
+    const recordatorios = await prisma.recordatorio.findMany({
+      where: { consulta_id: consultaId },
+      include: {
+        grupos: { include: { grupo_alimentar: true } },
+      },
+    });
+
+    if (!recordatorios.length) {
+      throw new AppException('Nenhum recordatório encontrado para esta consulta.', 404);
+    }
+
+    return recordatorios;
+  }
 }

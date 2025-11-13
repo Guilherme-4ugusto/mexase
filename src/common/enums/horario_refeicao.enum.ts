@@ -1,9 +1,8 @@
-export enum HorarioRefeicao {
-  CAFE_DA_MANHA = "Café da Manhã",
-  LANCHE_MANHA = "Lanche da Manhã",
+export enum TipoRefeicao {
+  DESJEJUM = "Desjejum",
+  COLACAO = "Colação",
   ALMOCO = "Almoço",
-  LANCHE_TARDE = "Lanche da Tarde",
+  LANCHE = "Lanche",
   JANTAR = "Jantar",
   CEIA = "Ceia",
-  OUTRO = "Outro"
 }
