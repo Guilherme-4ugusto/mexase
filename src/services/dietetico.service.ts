@@ -56,6 +56,9 @@ export class DieteticoService {
     const dadosDieteticos = await prisma.dadosDieteticos.findUnique({
       where: { paciente_id },
     });
+    if(!dadosDieteticos){
+      throw new DieteticoNaoEncontradoException();
+    }
     return dadosDieteticos;
   }
 }

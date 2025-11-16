@@ -7,6 +7,7 @@ import pacienteRoutes from './routes/paciente.routes';
 import { requestLogger } from './middleware/requestLogger.middleware'
 import consultaRoutes from './routes/consulta.route';
 import setorRoutes from './routes/setor.route';
+import grupoAlimentar from './routes/grupo_alimentar';
 
 
 dotenv.config();
@@ -22,7 +23,7 @@ app.use('/api', loginRoutes);
 app.use('/api', pacienteRoutes);
 app.use('/api', consultaRoutes);
 app.use('/api', setorRoutes);
-
+app.use('/api', grupoAlimentar);
 
 app.listen(PORT, () => { 
   console.log("Servidor rodando na porta: ", PORT, " 🚀"); 

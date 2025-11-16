@@ -7,7 +7,7 @@ import { PacienteInativoException } from '../common/exceptions/paciente/paciente
 import { PacienteJaAtivadoException } from '../common/exceptions/paciente/paciente_ja_ativado.exception';
 
 export class PacienteService {
-  async criar({ nome, email, cpf, data_nascimento, naturalidade, sexo, telefone, cd_setor }: CriarPacienteDTO) {
+  async criar({ nome, email, cpf, data_nascimento, naturalidade, sexo, telefone, cd_setor, escolaridade, estado_civil, profissao }: CriarPacienteDTO) {
     const existe = await prisma.paciente.findFirst({
       where: { cpf },
     });
@@ -23,6 +23,9 @@ export class PacienteService {
         naturalidade,
         sexo,
         telefone,
+        escolaridade,
+        estado_civil,
+        profissao,
         cd_setor
       },
     });
@@ -83,11 +86,13 @@ export class PacienteService {
         cpf: true,
         data_nascimento: true,
         telefone: true,
-        
         sexo: true,
         naturalidade: true,
         criadoEm: true,
         desativadoEm: true,
+        escolaridade: true,
+        estado_civil: true,
+        profissao: true,
         setor: {
           select: {
             nome: true,
@@ -129,7 +134,7 @@ export class PacienteService {
     return paciente;
   }
 
-  async atualizar(id: number, { nome, email, cpf, data_nascimento, naturalidade, sexo, telefone, cd_setor }: CriarPacienteDTO) {
+  async atualizar(id: number, { nome, email, cpf, data_nascimento, naturalidade, sexo, telefone, cd_setor, escolaridade, estado_civil, profissao }: CriarPacienteDTO) {
     const paciente = await prisma.paciente.findUnique({
       where: { id },
     });
@@ -153,6 +158,9 @@ export class PacienteService {
         naturalidade,
         sexo,
         telefone,
+        escolaridade,
+        estado_civil,
+        profissao,
         cd_setor
       },
     });

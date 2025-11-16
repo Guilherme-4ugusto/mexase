@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { atualizarRecordatorio, buscarRecordatorioPorConsultaId, criarRecordatorio } from '../controllers/recordatorio.service';
+import { atualizarRecordatorio, buscarRecordatorioPorConsultaId, criarRecordatorio } from '../controllers/recordatorio.controller';
 import { validarJWT } from '../middleware/auth.middleware';
 import { atualizarConsultaPorIdConsulta, buscarConsultaPorIdConsulta, criarConsulta } from '../controllers/consulta.controller';
 import { atualizarDiagnostico, buscarDiagnosticoPorConsultaId, criarDiagnostico } from '../controllers/diagnostico.controller';

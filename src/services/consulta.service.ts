@@ -28,6 +28,7 @@ export class ConsultaService {
             imc_atual,
             peso_atual,
             peso_habitual,
+            objetivo_consulta,
             somatorio_dobras
         }: CriarConsultaDTO
 
@@ -61,6 +62,7 @@ export class ConsultaService {
                 imc_atual,
                 peso_atual,
                 peso_habitual,
+                objetivo_consulta,
                 somatorio_dobras
             },
         });
@@ -89,6 +91,7 @@ export class ConsultaService {
             imc_atual,
             peso_atual,
             peso_habitual,
+            objetivo_consulta,
             somatorio_dobras
         }: CriarConsultaDTO
 
@@ -123,6 +126,7 @@ export class ConsultaService {
                 imc_atual,
                 peso_atual,
                 peso_habitual,
+                objetivo_consulta,
                 somatorio_dobras
             },
         });
@@ -133,7 +137,7 @@ export class ConsultaService {
             where: { id: consulta_id },
             include: {
                 diagnostico: true,
-                dadosBioquimicos: true,
+                dados_bioquimicos: true,
                 recordatorio: true,
                 nutricionista: {
                     select: {
@@ -169,23 +173,41 @@ export class ConsultaService {
 
 
     async buscarConsultaPorPaciente(id: number) {
-        const consulta = await prisma.consulta.findMany({
-            where: { id_paciente: id }
+        const consultas = await prisma.consulta.findMany({
+            where: { id_paciente: id },
+            select: {
+                id: true,
+                data_consulta: true,
+                nutricionista: {
+                    select: {
+                        nome: true
+                    }
+                },
+                paciente: {
+                    select: {
+                        nome: true,
+                        cpf: true,
+                        email: true,
+                        telefone: true,
+                    }
+                }
+            }
         });
 
-        if (!consulta) {
+        if (consultas.length === 0) {
             throw new ConsultaNaoEncontradoException();
         }
 
-        return consulta;
+        return consultas;
     }
+
 
     async buscarConsultaPorPacienteCompleta(id: number) {
         const consulta = await prisma.consulta.findMany({
             where: { id_paciente: id },
             include: {
                 diagnostico: true,
-                dadosBioquimicos: true,
+                dados_bioquimicos: true,
                 recordatorio: true,
                 nutricionista: {
                     select: {
@@ -219,7 +241,7 @@ export class ConsultaService {
             where: { id_nutricionista: id },
             include: {
                 diagnostico: true,
-                dadosBioquimicos: true,
+                dados_bioquimicos: true,
                 recordatorio: true,
                 nutricionista: {
                     select: {

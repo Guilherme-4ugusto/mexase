@@ -5,52 +5,64 @@ import { ClassificacaoNaoEncontradaException } from "../common/exceptions/classi
 
 export class ClassificacaoService {
 
-    async criar(consulta_id: number, { parametro, valor_classificacao}: CriarClassificacaoDTO) {
+    /**
+     * Cria várias classificações para uma consulta
+     */
+    async criarVarias(consulta_id: number, classificacoes: CriarClassificacaoDTO[]) {
 
         const consulta = await prisma.consulta.findUnique({
-                where: { id: consulta_id }
-            })
-    
+            where: { id: consulta_id }
+        });
+
         if (!consulta) {
             throw new ConsultaNaoEncontradoException();
         }
 
-         return await prisma.classificacao.create({
-            data: {
+        // Apaga classificações anteriores (caso já exista algo)
+        await prisma.classificacao.deleteMany({
+            where: { consulta_id }
+        });
+
+        // Insere múltiplos registros
+        return await prisma.classificacao.createMany({
+            data: classificacoes.map(c => ({
                 consulta_id,
-                parametro,
-                valor_classificacao
-            },
+                parametro: c.parametro,
+                valor_classificacao: c.valor_classificacao
+            }))
         });
-    
     }
 
-    async atualizar(classificacao_id: number, {  parametro, valor_classificacao }: CriarClassificacaoDTO){
-
-        const classificacao = await prisma.classificacao.findUnique({
-            where: { id: classificacao_id }
-        })
-
-        if (!classificacao) {
-            throw new ClassificacaoNaoEncontradaException();
+    /**
+     * Atualiza (substituindo) as classificações vinculadas a uma consulta
+     */
+    async atualizarVarias(consulta_id: number, classificacoes: CriarClassificacaoDTO[]) {
+        // Substitui tudo para evitar inconsistência
+        try {
+            await prisma.classificacao.deleteMany({ where: { consulta_id } });
+        } catch {
         }
-
-        return await prisma.classificacao.update({
-            where: { id : classificacao_id },
-            data: {
-                parametro,
-                valor_classificacao
-            },
+        return await prisma.classificacao.createMany({
+            data: classificacoes.map(c => ({
+                consulta_id,
+                parametro: c.parametro,
+                valor_classificacao: c.valor_classificacao
+            }))
         });
     }
 
+    /**
+     * Retorna todas as classificações de uma consulta
+     */
     async buscarClassificacoesPorConsultaId(consulta_id: number) {
         const classificacoes = await prisma.classificacao.findMany({
             where: { consulta_id },
         });
-        if (!classificacoes) {
+
+        if (!classificacoes || classificacoes.length === 0) {
             throw new ClassificacaoNaoEncontradaException();
         }
+
         return classificacoes;
     }
-}    
+}

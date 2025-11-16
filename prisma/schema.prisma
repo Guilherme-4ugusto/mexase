@@ -32,6 +32,7 @@ model Consulta {
   id                     Int      @id @default(autoincrement())
   eliminacao_intestinal   String? @db.VarChar(60)
   frequencia_evacuatoria  String? @db.VarChar(60)
+  objetivo_consulta       String? @db.VarChar(100)
   peso_atual              Float?
   peso_habitual           Float?
   estatura                Float?
@@ -51,12 +52,13 @@ model Consulta {
   somatorio_dobras        Float?
   id_nutricionista        Int
   id_paciente             Int
+  data_consulta   DateTime   @default(now())
 
   nutricionista  Nutricionista  @relation(fields: [id_nutricionista], references: [id])
   paciente       Paciente       @relation(fields: [id_paciente], references: [id])
   diagnostico     Diagnostico?
-  dadosBioquimicos DadosBioquimicos?
-  recordatorio    Recordatorio?
+  dados_bioquimicos DadoBioquimico[]
+  recordatorio    Recordatorio[]
   classificacoes  Classificacao[]
 }
 
@@ -91,6 +93,9 @@ model Paciente {
   naturalidade     String?  @db.VarChar(60)
   cd_setor     Int
   criadoEm     DateTime @default(now())
+  estado_civil String?  @db.VarChar(30)
+  escolaridade String?  @db.VarChar(40)
+  profissao String?  @db.VarChar(50)
   desativadoEm DateTime?
   
   setor        Setor    @relation(fields: [cd_setor], references: [cd_setor])
@@ -100,35 +105,48 @@ model Paciente {
   historicoFamiliar  HistoricoFamiliar?
 }
 
-model DadosBioquimicos {
-  id          Int     @id @default(autoincrement())
-  hemoglobina Float?
-  hematocrito Float?
-
-  consulta_id Int      @unique
-  consulta    Consulta @relation(fields: [consulta_id], references: [id])
-
+model DadoBioquimico {
+  id           Int      @id @default(autoincrement())
+  nome_exame   String   @db.VarChar(100)
+  valor        Float?
+  unidade      String?  @db.VarChar(20)
+  data_exame   DateTime
+  consulta_id  Int
+  consulta     Consulta @relation(fields: [consulta_id], references: [id])
   @@map("dados_bioquimicos")
 }
 
 
 model Recordatorio {
-  id                 Int      @id @default(autoincrement())
-  horario_refeicao   String   @db.Char(1)
-  frequencia         String   @db.Char(1)
-  observacao         String?  @db.VarChar(250)
-  id_grupo_alimentar Int
+  id                 Int                   @id @default(autoincrement())
+  dia_semana         String                @db.VarChar(15)
+  tipo_refeicao      String                @db.VarChar(25)
+  horario_refeicao   String?               @db.VarChar(10)
+  alimentos_consumidos String?             @db.VarChar(250)
+  frequencia         String?               @db.VarChar(25)
+  observacao         String?               @db.VarChar(250)
+  consulta_id          Int                 
 
-  consulta_id Int      @unique
-  consulta    Consulta @relation(fields: [consulta_id], references: [id])
+  consulta           Consulta              @relation(fields: [consulta_id], references: [id])
+  grupos             RecordatorioGrupo[]
+}
 
-  grupoAlimentar GrupoAlimentar @relation(fields: [id_grupo_alimentar], references: [id])
+model RecordatorioGrupo {
+  id_recordatorio      Int
+  id_grupo_alimentar   Int
+
+  recordatorio         Recordatorio         @relation(fields: [id_recordatorio], references: [id])
+  grupo_alimentar      GrupoAlimentar       @relation(fields: [id_grupo_alimentar], references: [id])
+
+  @@id([id_recordatorio, id_grupo_alimentar])
+  @@map("recordatorio_grupo")
 }
 
 model GrupoAlimentar {
   id              Int     @id @default(autoincrement())
   nome            String  @db.VarChar(150)
-  recordatorios   Recordatorio[]
+
+  recordatorioGrupos   RecordatorioGrupo[]
   @@map("grupo_alimentar")
 }
 

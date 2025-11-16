@@ -1,56 +1,64 @@
 import { ConsultaNaoEncontradoException } from "../common/exceptions/consulta/consulta_nao_encontrado.exception";
-import { CriarDadosBioquimicosDTO } from "../dtos/dados_bioquicos.dto";
-import { prisma } from '../prisma/client';
+import { prisma } from "../prisma/client";
 import { DadosBioquimicosNaoEncontradosException } from "../common/exceptions/dados_bioquimicos/dados_bioquimicos.exception";
+import { CriarDadoBioquimicoDTO } from "../dtos/dados_bioquicos.dto";
 
 export class DadosBioquimicosService {
 
-    async criar(consulta_id: number, { hemoglobina, hematocrito }: CriarDadosBioquimicosDTO) {
-
+    async criar(consulta_id: number, dados: CriarDadoBioquimicoDTO[]) {
         const consulta = await prisma.consulta.findUnique({
-                where: { id: consulta_id }
-            })
-    
+            where: { id: consulta_id },
+        });
+
         if (!consulta) {
             throw new ConsultaNaoEncontradoException();
         }
 
-         return await prisma.dadosBioquimicos.create({
-            data: {
+        const novosDados = await prisma.dadoBioquimico.createMany({
+            data: dados.map((item) => ({
                 consulta_id,
-                hemoglobina,
-                hematocrito
-            },
+                nome_exame: item.nome_exame,
+                valor: item.valor,
+                unidade: item.unidade,
+                data_exame: new Date(item.data_exame),
+            })),
         });
-    
+
+        return novosDados;
     }
 
-    async atualizar(consulta_id: number, { hemoglobina, hematocrito }: CriarDadosBioquimicosDTO){
 
-        const dados_bioquicos = await prisma.dadosBioquimicos.findUnique({
-            where: { consulta_id: consulta_id }
-        })
-
-        if (!dados_bioquicos) {
-            throw new DadosBioquimicosNaoEncontradosException();
+    async atualizar(consulta_id: number, dados: CriarDadoBioquimicoDTO[]) {
+        try {
+            await prisma.dadoBioquimico.deleteMany({
+                where: { consulta_id },
+            });
+        } catch (error) {
         }
 
-        return await prisma.dadosBioquimicos.update({
-            where: { consulta_id },
-            data: {
-                hemoglobina,
-                hematocrito
-            },
+        const novos = await prisma.dadoBioquimico.createMany({
+            data: dados.map((item) => ({
+                consulta_id,
+                nome_exame: item.nome_exame,
+                valor: item.valor,
+                unidade: item.unidade,
+                data_exame: new Date(item.data_exame),
+            })),
         });
+
+        return novos;
     }
 
     async buscarDadosBioquimicosPorConsultaId(consulta_id: number) {
-        const dados_bioquicos = await prisma.dadosBioquimicos.findUnique({
+        const dados = await prisma.dadoBioquimico.findMany({
             where: { consulta_id },
+            orderBy: { data_exame: "desc" },
         });
-        if (!dados_bioquicos) {
+
+        if (dados.length === 0) {
             throw new DadosBioquimicosNaoEncontradosException();
         }
-        return dados_bioquicos;
+
+        return dados;
     }
-}    
+}
