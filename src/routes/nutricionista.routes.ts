@@ -14,4 +14,6 @@ router.get('/nutricionistas/', validarJWT, nutricionistaController.buscarNutrici
 router.get('/nutricionista/:id/consultas', validarJWT, buscarConsultasPorIdNutri)
 router.patch('/nutricionista/:id/alterar-senha', validarJWT, nutricionistaController.alterarSenhaNutricionista);
 router.patch('/nutricionista/:id/alterar-tema', validarJWT, nutricionistaController.alterarTemaDoNutricionista);
-export default router;
+router.get('/nutricionista/:id/total-consultas-mes', validarJWT, nutricionistaController.buscarTotalDeConsultasDoMes);
+router.get('/nutricionista/:id/consultas-ultimos-12-meses', validarJWT, nutricionistaController.buscarTotalDeConsultasDosUltimos12Meses);
+  export default router;

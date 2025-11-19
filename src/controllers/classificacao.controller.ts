@@ -9,18 +9,28 @@ import { logger } from '../utils/logger';
 const service = new ClassificacaoService();
 
 export const criarClassificacao = async (req: Request, res: Response) => {
-  const dto = plainToInstance(CriarClassificacaoDTO, req.body);
+  const dtoArray = plainToInstance(CriarClassificacaoDTO, [req.body]);
   const { consulta_id } = req.params
 
-  const erros = await validate(dto);
+  const errosValidados = [];
 
-  if (erros.length > 0) {
-    const mensagens = erros.map(e => Object.values(e.constraints || {})).flat();
+  for (const dto of dtoArray) {
+    const erros = await validate(dto);
+    if (erros.length > 0) {
+      errosValidados.push(...erros);
+    }
+  }
+
+  if (errosValidados.length > 0) {
+    const mensagens = errosValidados
+      .map(e => Object.values(e.constraints ?? {}))
+      .flat();
+
     return res.status(400).json({ errors: mensagens });
   }
 
   try {
-    const novaClassificao = await service.criar(parseInt(consulta_id), dto);
+    const novaClassificao = await service.criarVarias(parseInt(consulta_id), dtoArray);
     return res.status(201).json(novaClassificao);
   } catch (error: any) {
     logger.error(error);
@@ -48,16 +58,27 @@ export const buscarClassificacoesPorConsultaId = async (req: Request, res: Respo
 
 export const atualizarClassificao = async (req: Request, res: Response) => {
   const { classificacao_id } = req.params
-  const dto = plainToInstance(CriarClassificacaoDTO, req.body);
+  const dtoArray = plainToInstance(CriarClassificacaoDTO, [req.body]);
 
-  const erros = await validate(dto);
-  if (erros.length > 0) {
-    const mensagens = erros.map(e => Object.values(e.constraints || {})).flat();
-    return res.status(400).json({ errors: mensagens });
+  const errosValidados = [];
+
+  for (const dto of dtoArray) {
+    const erros = await validate(dto);
+    if (erros.length > 0) {
+      errosValidados.push(...erros);
+    }
   }
 
+  if (errosValidados.length > 0) {
+    const mensagens = errosValidados
+      .map(e => Object.values(e.constraints ?? {}))
+      .flat();
+
+    return res.status(400).json({ errors: mensagens });
+  }
+  
   try {
-    const classificacaoAtualizada = await service.atualizar(parseInt(classificacao_id), dto);
+    const classificacaoAtualizada = await service.atualizarVarias(parseInt(classificacao_id), dtoArray);
     return res.status(200).json(classificacaoAtualizada);
   } catch (error: any) {
     logger.error(error);

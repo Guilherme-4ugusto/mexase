@@ -218,5 +218,29 @@ export class PacienteService {
 
       return dados
   }
-}
 
+  async evolucaoAntropometrica(idPaciente: number) {
+    const consultas = await prisma.consulta.findMany({
+      where: { id_paciente: idPaciente },
+      orderBy: { data_consulta: "asc" },
+      select: {
+        data_consulta: true,
+        peso_atual: true,
+        imc_atual: true,
+        cc: true,
+        cq: true,
+        somatorio_dobras: true,
+      },
+    });
+
+    return consultas.map((c) => ({
+      data: c.data_consulta,
+      peso: c.peso_atual,
+      imc: c.imc_atual,
+      cintura: c.cc,
+      quadril: c.cq,
+      rcq: c.cc && c.cq ? Number((c.cc / c.cq).toFixed(2)) : null,
+      dobras: c.somatorio_dobras,
+    }));
+  }
+}
