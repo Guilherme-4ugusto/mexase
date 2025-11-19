@@ -246,4 +246,103 @@ export class NutricionistaService {
     });
     return;
   }
+
+  async totalConsultasDoMes(id: number) {
+    const agora = new Date();
+
+    const inicioMesAtual = new Date(agora.getFullYear(), agora.getMonth(), 1);
+
+    const inicioMesAnterior = new Date(
+      agora.getFullYear(),
+      agora.getMonth() - 1,
+      1
+    );
+
+    const fimMesAnterior = new Date(agora.getFullYear(), agora.getMonth(), 0);
+
+    const totalMesAtual = await prisma.consulta.count({
+      where: {
+        id_nutricionista: id,
+        data_consulta: {
+          gte: inicioMesAtual,
+          lte: agora,
+        },
+      },
+    });
+
+    const totalMesAnterior = await prisma.consulta.count({
+      where: {
+        id_nutricionista: id,
+        data_consulta: {
+          gte: inicioMesAnterior,
+          lte: fimMesAnterior,
+        },
+      },
+    });
+
+    let crescimento = 0;
+
+    if (totalMesAnterior > 0) {
+      crescimento =
+        ((totalMesAtual - totalMesAnterior) / totalMesAnterior) * 100;
+    }
+
+    return {
+      totalMesAtual,
+      totalMesAnterior,
+      crescimento: Number(crescimento.toFixed(2)),
+    };
+  }
+
+  async ultimos12MesesConsultas(id: number) {
+    const agora = new Date();
+
+    const inicioPeriodo = new Date(
+      agora.getFullYear(),
+      agora.getMonth() - 11,
+      1
+    );
+    const fimPeriodo = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
+
+    const consultas = await prisma.$queryRaw<
+      { ano: number; mes: number; total: number }[]
+    >`
+    SELECT 
+      YEAR(data_consulta) AS ano,
+      MONTH(data_consulta) AS mes,
+      COUNT(*) AS total
+    FROM consulta
+    WHERE id_nutricionista = ${id}
+      AND data_consulta BETWEEN ${inicioPeriodo} AND ${fimPeriodo}
+    GROUP BY ano, mes
+    ORDER BY ano, mes;
+  `;
+
+    const meses = [];
+
+    for (let i = 0; i < 12; i++) {
+      const data = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
+
+      meses.push({
+        ano: data.getFullYear(),
+        mes: data.getMonth() + 1,
+      });
+    }
+
+    meses.reverse();
+
+    const mesesComTotais = meses.map((m) => {
+      const encontrado = consultas.find(
+        (c) => c.ano === m.ano && c.mes === m.mes
+      );
+
+      return {
+        ano: m.ano,
+        mes: m.mes,
+        total: encontrado ? Number(encontrado.total) : 0,
+      };
+    });
+
+    return mesesComTotais;
+  }
 }

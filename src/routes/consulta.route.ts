@@ -5,6 +5,7 @@ import { atualizarConsultaPorIdConsulta, buscarConsultaPorIdConsulta, criarConsu
 import { atualizarDiagnostico, buscarDiagnosticoPorConsultaId, criarDiagnostico } from '../controllers/diagnostico.controller';
 import * as dadosBioquimicosController from '../controllers/dados_bioquimicos.controller'; 
 import * as classificacaoController from '../controllers/classificacao.controller'; 
+import {gerarPdfConsulta} from "../controllers/pdf.controller";
 
 
 const router = Router();
@@ -28,5 +29,7 @@ router.get('/consulta/:consulta_id/dados-bioquimicos', validarJWT, dadosBioquimi
 router.post('/consulta/:consulta_id/dados-bioquimicos', validarJWT, classificacaoController.criarClassificacao);
 router.put('/consulta/:consulta_id/dados-bioquimicos', validarJWT, classificacaoController.atualizarClassificao);
 router.get('/consulta/:consulta_id/dados-bioquimicos', validarJWT, classificacaoController.buscarClassificacoesPorConsultaId);
+
+router.get('/consulta/:consulta_id/pdf', validarJWT, gerarPdfConsulta);
 
 export default router;
